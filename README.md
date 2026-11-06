@@ -16,12 +16,15 @@ To reset the counter back to 0/0, just bomb.
 
 thprac will still work with games not listed here, the 50 set counter just won't exist.
 
-TH10 - Exists and Tested
-Th14 - Exists and Tested
-TH15 - Exists and Tested
-TH16 - Exists and Tested
-TH17 - Exists and Tested
-TH18 - Exists and Tested
+| Game | Exists | Tested |
+| ---- | ------ | ------ |
+| TH10 |   Y    |   Y    |
+| TH14 |   Y    |   Y    |
+| TH15 |   Y    |   Y    |
+| TH16 |   Y    |   Y    |
+| TH17 |   Y    |   Y    |
+| TH18 |   Y    |   Y    |
+
 
 Additional Notes:
 
