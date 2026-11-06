@@ -2058,9 +2058,8 @@ namespace TH20 {
         void FpsInit()
         {
             mOptCtx.fps_dbl = 60.0;
-            if ((mOptCtx.vpatch_base = (uintptr_t)GetModuleHandleW(L"openinputlagpatch.dll")) != NULL) {
-                OILPInit(mOptCtx);
-            }else if (GetMemContent<uint8_t>(RVA(0x1C4F89)) == 3) {
+
+            if (GetMemContent<uint8_t>(RVA(0x1C4F89)) == 3) {
                 mOptCtx.fps_status = 1;
 
                 DWORD oldProtect;
@@ -2072,11 +2071,7 @@ namespace TH20 {
         }
         void FpsSet()
         {
-            if (mOptCtx.fps_status == 3) {
-                mOptCtx.oilp_set_game_fps(mOptCtx.fps);
-                mOptCtx.oilp_set_replay_skip_fps(mOptCtx.fps_replay_fast);
-                mOptCtx.oilp_set_replay_slow_fps(mOptCtx.fps_replay_slow);
-            } else  if (mOptCtx.fps_status == 1) {
+            if (mOptCtx.fps_status == 1) {
                 mOptCtx.fps_dbl = (double)mOptCtx.fps;
             }
         }
@@ -4010,7 +4005,6 @@ namespace TH20 {
         while (iter) {
             DWORD patt = *(DWORD*)(iter);
             if(patt){
-                int att = *(int*)(patt + 0x94);
                 if ((*(DWORD*)(patt + 0x14)) & 1) {
                    
                     if ((*(DWORD*)(patt + 0x14)) & 0x2) // round
@@ -4021,7 +4015,6 @@ namespace TH20 {
                         float r = *(float*)(patt + 0x18);
                         p->AddCircleFilled(cen, GetClientFromStage2(r), 0x33FF0000);
                         p->AddCircle(cen, GetClientFromStage2(r), 0xFFFF0000);
-                        p->AddText({ cen.x, cen.y - 20.0f }, 0xFFFFFFFF, std::format("{}", att).c_str());
                     } else {
                         float x = *(float*)(patt + 0x34);
                         float y = *(float*)(patt + 0x38);
@@ -4047,7 +4040,6 @@ namespace TH20 {
                         p4 = GetClientFromStage(p4);
                         p->AddQuadFilled(p1, p2, p3, p4, 0x33FF0000);
                         p->AddQuad(p1, p2, p3, p4, 0xFFFF0000);
-                        p->AddText({ p1.x, p1.y - 20.0f }, 0xFFFFFFFF, std::format("{}", att).c_str());
                     }
                 }
             }

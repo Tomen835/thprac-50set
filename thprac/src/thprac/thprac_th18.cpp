@@ -1243,6 +1243,8 @@ namespace TH18 {
         int32_t mMissCount;
         int32_t mBombCount;
         int32_t mDeadBombCount;
+        int32_t diecount = 0;
+        int32_t retrycount = 0;
 
         int32_t active_uses[12];
     protected:
@@ -1322,6 +1324,10 @@ namespace TH18 {
             ImGui::Text(S(THPRAC_INGAMEINFO_BOMB_COUNT));
             ImGui::NextColumn();
             ImGui::Text("%8d", mBombCount);
+            ImGui::NextColumn();
+            ImGui::Text("50 Set");
+            ImGui::NextColumn();
+            ImGui::Text("%6d / %d", retrycount - diecount, retrycount);
             
             if (g_adv_igi_options.th18_card_activated_count)
             {
@@ -4077,11 +4083,14 @@ namespace TH18 {
         TH18InGameInfo::singleton().mBombCount = 0;
         TH18InGameInfo::singleton().mMissCount = 0;
         TH18InGameInfo::singleton().mDeadBombCount = 0;
+        TH18InGameInfo::singleton().retrycount++;
         memset(TH18InGameInfo::singleton().active_uses, 0, sizeof(TH18InGameInfo::singleton().active_uses));
     })
     EHOOK_DY(th18_bomb_dec, 0x4574D3,4, // bomb dec
     {
         TH18InGameInfo::singleton().mBombCount++;
+        TH18InGameInfo::singleton().diecount = 0;
+        TH18InGameInfo::singleton().retrycount = 0;
     })
     EHOOK_DY(th18_cylinder, 0x410F22,5, // cylinder
     {
@@ -4090,11 +4099,13 @@ namespace TH18 {
     EHOOK_DY(th18_life_dec, 0x45D1A3,5, // life dec
     {
         TH18InGameInfo::singleton().mMissCount++;
+        TH18InGameInfo::singleton().diecount++;
         FastRetry(thPracParam.mode);
     })
     EHOOK_DY(th18_deadbomb1, 0x40DA1C,5, // rokumon
     {
         TH18InGameInfo::singleton().mDeadBombCount++;
+
     })
     EHOOK_DY(th18_deadbomb2, 0x40A534,5, // autobomb
     {

@@ -38,7 +38,6 @@ namespace TH14 {
         int32_t graze;
 
         int32_t faketype;
-        float st6bs8_phase;
 
         bool dlg;
         bool keepSpellDrops;
@@ -70,7 +69,6 @@ namespace TH14 {
             GetJsonValue(value);
             GetJsonValue(graze);
             GetJsonValue(faketype);
-            GetJsonValue(st6bs8_phase);
 
             return true;
         }
@@ -102,7 +100,6 @@ namespace TH14 {
                 AddJsonValue(value);
                 AddJsonValue(graze);
                 AddJsonValue(faketype);
-                AddJsonValue(st6bs8_phase);
 
                 ReturnJson();
             } else if (mode == 2) {
@@ -177,7 +174,6 @@ namespace TH14 {
                 thPracParam.value = *mValue;
                 thPracParam.graze = *mGraze;
                 thPracParam.faketype = *mFakeType;
-                thPracParam.st6bs8_phase = *mST6BS8_Custom;
                 break;
             case 4:
                 Close();
@@ -235,8 +231,6 @@ namespace TH14 {
                 return TH14_SPELL_5PHASE;
             } else if (section == TH14_ST3_MID2_HL){
                 return TH_TIMEOUT_SETTING;
-            } else if (section == TH14_ST6_BOSS8) {
-                return TH_MODE_SELECT;
             }
             return nullptr;
         }
@@ -395,9 +389,6 @@ namespace TH14 {
                     mDlg();
                 mPhase(TH_PHASE, SpellPhase());
 
-                if (sections[*mSection] == TH14_ST6_BOSS8 && *mPhase) {
-                    mST6BS8_Custom();
-                }
                 if (SectionHasSpellDrops(sections[*mSection]))
                     mKeepSpellDrops();
                 break;
@@ -424,9 +415,6 @@ namespace TH14 {
         Gui::GuiSlider<int, ImGuiDataType_S32> mBomb { TH_BOMB, 0, 8 };
         Gui::GuiSlider<int, ImGuiDataType_S32> mBombFragment { TH_BOMB_FRAGMENT, 0, 7 };
         Gui::GuiSlider<int, ImGuiDataType_S32> mPower { TH_POWER, 100, 400 };
-
-        Gui::GuiSlider<float, ImGuiDataType_Float> mST6BS8_Custom { TH_BT_PHASE, -1.0f, 1.0f};
-
         Gui::GuiDrag<int, ImGuiDataType_S32> mValue { TH_VALUE, 0, 999990, 10, 100000 };
         Gui::GuiDrag<int, ImGuiDataType_S32> mGraze { TH_GRAZE, 0, 999999, 1, 100000 };
 
@@ -2316,16 +2304,6 @@ namespace TH14 {
             ecl << pair{0x638, 1}; // Set Health
             ecl << pair{0x658, (int8_t)0x34}; // Set Spell Ordinal
             ecl << pair{0x75e0, (int16_t)0}; // Disable Item Drops
-            if (thPracParam.phase)
-            {
-                ecl << pair { 0x7CBC, (int16_t)0 };
-                ecl << pair { 0x7CE4, (int16_t)0 };
-                ecl << pair { 0x7CDC, (float)0.0174533f * thPracParam.st6bs8_phase };
-
-                ecl << pair { 0x7E00, (int16_t)0 };
-                ecl << pair { 0x7E28, (int16_t)0 };
-                ecl << pair { 0x7E20, (float)-0.0174533f * thPracParam.st6bs8_phase };
-            }
             break;
         case THPrac::TH14::TH14_ST6_BOSS9:
             st6_boss(4);
@@ -3296,19 +3274,15 @@ namespace TH14 {
     {
         g_lock_timer = 0;
     })
-    EHOOK_DY(th14_lock_timer2, 0x4288B6,4, // spell case 522/528/537/538/539
+    EHOOK_DY(th14_lock_timer2, 0x4286BA,4, // SetNextPattern case 514
     {
         g_lock_timer = 0;
     })
-    EHOOK_DY(th14_lock_timer3, 0x4289EA,5, // spellEnd case 523
+    EHOOK_DY(th14_lock_timer3, 0x427888,2, // set boss mode case 512
     {
         g_lock_timer = 0;
     })
-    EHOOK_DY(th14_lock_timer4, 0x427888,2, // set boss mode case 512
-    {
-        g_lock_timer = 0;
-    })
-    EHOOK_DY(th14_lock_timer5, 0x42C0D4,6, // decrease time (update)
+    EHOOK_DY(th14_lock_timer4, 0x42C0D4,6, // decrease time (update)
     {
         g_lock_timer_flag = true;
     })
