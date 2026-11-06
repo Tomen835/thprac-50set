@@ -589,6 +589,8 @@ namespace TH10 {
         int32_t mBombCount;
         int32_t mWhiteCount;
         int32_t mYellowCount;
+        int32_t diecount = 0;
+        int32_t retrycount = 0;
     protected:
         virtual void OnLocaleChange() override
         {
@@ -630,6 +632,11 @@ namespace TH10 {
             ImGui::Text(S(THPRAC_INGAMEINFO_BOMB_COUNT));
             ImGui::NextColumn();
             ImGui::Text("%8d", mBombCount);
+            ImGui::NextColumn();
+            ImGui::Text("50 Set");
+            ImGui::NextColumn();
+            ImGui::Text("%8d / %d", retrycount - diecount, retrycount);
+
 
             if (g_adv_igi_options.th10_show_point_item)
             {
@@ -3016,10 +3023,14 @@ namespace TH10 {
         TH10InGameInfo::singleton().mMissCount = 0;
         TH10InGameInfo::singleton().mWhiteCount = 0;
         TH10InGameInfo::singleton().mYellowCount = 0;
+        TH10InGameInfo::singleton().retrycount++;
+
     })
     EHOOK_DY(th10_bomb_dec, 0x4259CF,5, // bomb dec
     {
         TH10InGameInfo::singleton().mBombCount++;
+        TH10InGameInfo::singleton().diecount = 0;
+        TH10InGameInfo::singleton().retrycount = 0;
     })
     EHOOK_DY(th10_bomb_dec2, 0x425C3E,5, // bomb dec
     {
@@ -3028,6 +3039,7 @@ namespace TH10 {
     EHOOK_DY(th10_life_dec, 0x426A1C,6, // life dec
     {
         TH10InGameInfo::singleton().mMissCount++;
+        TH10InGameInfo::singleton().diecount++;
         FastRetry(thPracParam.mode);
     })
     EHOOK_DY(th10_move, 0x425442,2,

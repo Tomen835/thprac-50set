@@ -620,6 +620,8 @@ namespace TH15 {
     public:
         int32_t mMissCount;
         int32_t mBombCount;
+        int32_t diecount = 0;
+        int32_t retrycount = 0;
     protected:
         virtual void OnLocaleChange() override
         {
@@ -722,6 +724,10 @@ namespace TH15 {
                 ImGui::Text(S(THPRAC_INGAMEINFO_MISS_COUNT));ImGui::NextColumn();ImGui::Text("%8d",mMissCount);
                 ImGui::NextColumn();
                 ImGui::Text(S(THPRAC_INGAMEINFO_BOMB_COUNT));ImGui::NextColumn();ImGui::Text("%8d",mBombCount);
+                ImGui::NextColumn();
+                ImGui::Text("50 Set");
+                ImGui::NextColumn();
+                ImGui::Text("%8d / %d", retrycount - diecount, retrycount);
                 ImGui::NextColumn();
                 if (g_adv_igi_options.th15_showShootingDownRate) {
                     int32_t cur_killed = *(int32_t*)(0x004E7488);
@@ -2683,14 +2689,18 @@ namespace TH15 {
     {
         TH15InGameInfo::singleton().mBombCount = 0;
         TH15InGameInfo::singleton().mMissCount = 0;
+        TH15InGameInfo::singleton().retrycount++;
     })
     EHOOK_DY(th15_bomb_dec, 0x41497A,5, // bomb dec
     {
         TH15InGameInfo::singleton().mBombCount++;
+        TH15InGameInfo::singleton().diecount = 0;
+        TH15InGameInfo::singleton().retrycount = 0;
     })
     EHOOK_DY(th15_life_dec, 0x456398,5, // life dec
     {
-       TH15InGameInfo::singleton().mMissCount++;
+        TH15InGameInfo::singleton().mMissCount++;
+        TH15InGameInfo::singleton().diecount++;
        FastRetry(thPracParam.mode);
     })
     EHOOK_DY(th15_lock_timer1, 0x43404A,10, // initialize

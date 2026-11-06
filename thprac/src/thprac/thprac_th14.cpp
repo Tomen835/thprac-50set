@@ -638,6 +638,8 @@ namespace TH14 {
         int32_t m12Count;
         int32_t m16Count;
         int32_t m20Count;
+        int32_t diecount = 0;
+        int32_t retrycount = 0;
 
     protected:
         virtual void OnLocaleChange() override
@@ -773,7 +775,12 @@ namespace TH14 {
                     ImGui::SameLine(0.0f, 0.0f);
                 }
                 ImGui::TextColored(cycle == 4 ? color_life_next : color_life, "%s", S(THPRAC_INGAMEINFO_TH14_BONUS_LIFE));
+                
             }
+            ImGui::NextColumn();
+            ImGui::Text("50 Set");
+            ImGui::NextColumn();
+            ImGui::Text("%8d / %d", retrycount - diecount, retrycount);
         }
 
         virtual void OnPreUpdate() override
@@ -3246,14 +3253,18 @@ namespace TH14 {
         TH14InGameInfo::singleton().m12Count = 0;
         TH14InGameInfo::singleton().m16Count = 0;
         TH14InGameInfo::singleton().m20Count = 0;
+        TH14InGameInfo::singleton().retrycount++;
     })
     EHOOK_DY(th14_bomb_dec, 0x41218A,5, // bomb dec
     {
         TH14InGameInfo::singleton().mBombCount++;
+        TH14InGameInfo::singleton().diecount = 0;
+        TH14InGameInfo::singleton().retrycount = 0;
     })
     EHOOK_DY(th14_life_dec, 0x44F618,5, // life dec
     {
         TH14InGameInfo::singleton().mMissCount++;
+        TH14InGameInfo::singleton().diecount++;
         FastRetry(thPracParam.mode);
     })
     EHOOK_DY(th14_get_item, 0x438DF8,6,

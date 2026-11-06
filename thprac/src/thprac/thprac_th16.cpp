@@ -572,6 +572,8 @@ namespace TH16 {
         int32_t mMissCount;
         int32_t mBombCount;
         int32_t mReleaseCount;
+        int32_t diecount = 0;
+        int32_t retrycount = 0;
 
     protected:
         virtual void OnLocaleChange() override
@@ -620,6 +622,10 @@ namespace TH16 {
             ImGui::Text(S(THPRAC_INGAMEINFO_16_RELEASE_COUNT));
             ImGui::NextColumn();
             ImGui::Text("%8d", mReleaseCount);
+            ImGui::NextColumn();
+            ImGui::Text("50 Set");
+            ImGui::NextColumn();
+            ImGui::Text("%8d / %d", retrycount - diecount, retrycount);
         }
 
         virtual void OnPreUpdate() override
@@ -2741,14 +2747,18 @@ namespace TH16 {
         TH16InGameInfo::singleton().mBombCount = 0;
         TH16InGameInfo::singleton().mMissCount = 0;
         TH16InGameInfo::singleton().mReleaseCount = 0;
+        TH16InGameInfo::singleton().retrycount++;
     })
     EHOOK_DY(th16_bomb_dec, 0x40DB9C,5, // bomb dec
     {
         TH16InGameInfo::singleton().mBombCount++;
+        TH16InGameInfo::singleton().diecount = 0;
+        TH16InGameInfo::singleton().retrycount = 0;
     })
     EHOOK_DY(th16_life_dec, 0x443D3A,5, // life dec
     {
         TH16InGameInfo::singleton().mMissCount++;
+        TH16InGameInfo::singleton().diecount++;
         FastRetry(thPracParam.mode);
     })
     EHOOK_DY(th16_release, 0x40DC8A,10,

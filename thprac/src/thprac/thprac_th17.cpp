@@ -823,6 +823,8 @@ namespace TH17 {
         int32_t mOtterCount;
         int32_t mEagerCount;
         uint32_t keiki_final_phase_t[4];
+        int32_t diecount = 0;
+        int32_t retrycount = 0;
 
     protected:
         virtual void OnLocaleChange() override
@@ -891,6 +893,10 @@ namespace TH17 {
             ImGui::Text(S(THPRAC_INGAMEINFO_17_ROAR_BREAK_COUNT));
             ImGui::NextColumn();
             ImGui::Text("%7d", mRoarBreakCount);
+            ImGui::NextColumn();
+            ImGui::Text("50 Set");
+            ImGui::NextColumn();
+            ImGui::Text("%8d / %d", retrycount - diecount, retrycount);
         }
 
         virtual void OnPreUpdate() override
@@ -2775,11 +2781,13 @@ namespace TH17 {
         TH17InGameInfo::singleton().mWolfCount = 0;
         TH17InGameInfo::singleton().mOtterCount = 0;
         TH17InGameInfo::singleton().mEagerCount = 0;
+        TH17InGameInfo::singleton().retrycount++;
         memset(TH17InGameInfo::singleton().keiki_final_phase_t, 0, sizeof(TH17InGameInfo::singleton().keiki_final_phase_t));
     })
     EHOOK_DY(th17_roar_break, 0x40F880,10,
     {
         TH17InGameInfo::singleton().mRoarBreakCount++;
+        TH17InGameInfo::singleton().diecount++;
     })
     EHOOK_DY(th17_roar, 0x40FC8A,7,
     {
@@ -2812,11 +2820,14 @@ namespace TH17 {
     EHOOK_DY(th17_life_dec, 0x44921B,6,
     {
         TH17InGameInfo::singleton().mMissCount++;
+        TH17InGameInfo::singleton().diecount++;
         FastRetry(thPracParam.mode);
     })
     EHOOK_DY(th17_bomb_dec, 0x411CAB,6,
     {
         TH17InGameInfo::singleton().mBombCount++;
+        TH17InGameInfo::singleton().diecount = 0;
+        TH17InGameInfo::singleton().retrycount = 0;
     })
     EHOOK_DY(th17_lock_timer1, 0x42A3CA,10, // initialize
     {
